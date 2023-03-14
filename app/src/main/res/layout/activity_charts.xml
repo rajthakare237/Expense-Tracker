@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ChartsActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/folderAppBarCharts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        app:elevation="0dp"
+        android:background="@android:color/transparent"
+        >
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/profileToolbarCharts"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@color/black"
+            app:elevation="0dp"
+            app:title="Charts"
+            app:titleTextColor="@color/black">
+        </com.google.android.material.appbar.MaterialToolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+<!--    <com.anychart.AnyChartView-->
+<!--        android:id="@+id/pieChartActivity"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="250dp"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_below="@id/folderAppBarCharts"-->
+<!--        android:layout_margin="16dp" />-->
+
+
+    <com.anychart.AnyChartView
+        android:id="@+id/barGraph"
+        android:layout_width="match_parent"
+        android:layout_height="600dp"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/folderAppBarCharts"
+        android:layout_margin="16dp" />
+
+
+</RelativeLayout>
