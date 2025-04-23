@@ -20,6 +20,7 @@ import java.text.MessageFormat.format
 import java.text.SimpleDateFormat
 import java.util.*
 
+// This is a adapter for recycler view to load goal items in goal activity
 class GoalAdapter(val context: Context, val arrayList: ArrayList<Goal>) :
     RecyclerView.Adapter<GoalAdapter.ViewHolder>() {
 

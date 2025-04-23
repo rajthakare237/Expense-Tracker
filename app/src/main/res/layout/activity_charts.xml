@@ -37,14 +37,73 @@
 <!--        android:layout_below="@id/folderAppBarCharts"-->
 <!--        android:layout_margin="16dp" />-->
 
-
-    <com.anychart.AnyChartView
-        android:id="@+id/barGraph"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/weeklyButton"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        android:layout_centerHorizontal="true"
+        android:layout_height="80dp"
         android:layout_below="@id/folderAppBarCharts"
-        android:layout_margin="16dp" />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundColor="#6080DA"
+        app:backgroundTint="#6080DA"
+        android:text="Weekly Expenses"
+        android:textSize="18sp"
+        app:cornerRadius="10dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/monthlyButton"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@id/weeklyButton"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundColor="#6080DA"
+        app:backgroundTint="#6080DA"
+        android:text="Monthly Expenses"
+        android:textSize="18sp"
+        app:cornerRadius="10dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/yearlyButton"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@id/monthlyButton"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundColor="#6080DA"
+        app:backgroundTint="#6080DA"
+        android:text="Yearly Expenses"
+        android:textSize="18sp"
+        app:cornerRadius="10dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/allButton"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_below="@id/yearlyButton"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        app:backgroundColor="#6080DA"
+        app:backgroundTint="#6080DA"
+        android:text="All Expenses"
+        android:textSize="18sp"
+        app:cornerRadius="10dp" />
+
+
+<!--    <com.anychart.AnyChartView-->
+<!--        android:id="@+id/barGraph"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="600dp"-->
+<!--        android:layout_below="@id/allButton"-->
+<!--        android:layout_centerHorizontal="true"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        android:layout_marginBottom="16dp" />-->
 
 
 </RelativeLayout>

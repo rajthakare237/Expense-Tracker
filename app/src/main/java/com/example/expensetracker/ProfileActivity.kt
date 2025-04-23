@@ -1,8 +1,17 @@
 package com.example.expensetracker
 
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.ProgressBar
@@ -10,6 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.example.expensetracker.Models.Expense
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.chip.Chip
@@ -24,8 +34,17 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import de.hdodenhof.circleimageview.CircleImageView
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ProfileActivity : AppCompatActivity() {
+
+    lateinit var notificationManager: NotificationManager
+    lateinit var notificationChannel: NotificationChannel
+    lateinit var builder: Notification.Builder
+    private val channelId = "i.apps.notifications"
+    private val description = "Test notification"
 
     lateinit var profileToolbar: MaterialToolbar
     lateinit var logout: ImageView
@@ -52,11 +71,153 @@ class ProfileActivity : AppCompatActivity() {
 
     var checkPriorList = ArrayList<String>()
 
+    fun removeDecimal(input: String): Int {
+        val index = input.indexOf('.')
+        return if (index == -1) {
+            // Input doesn't contain a decimal point
+            input.toInt()
+        } else {
+            // Input contains a decimal point, remove the decimal and all digits after it
+            input.substring(0, index).toInt()
+        }
+    }
 
+    // function to read last month expenses
+    fun getLastMonthExpense() {
+
+        var spentAmount = 0
+        var monthlySpendingLimit = 0
+
+        FirebaseDatabase.getInstance().reference.child("users")
+            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+            .child("maxSpendingLimit").addValueEventListener(object : ValueEventListener{
+                override fun onDataChange(snapshot: DataSnapshot) {
+
+                    if(snapshot.exists()){
+
+
+                        if(!snapshot!!.value.toString().isNullOrEmpty()){
+                            monthlySpendingLimit = snapshot.value.toString().toLong().toInt()
+                        }
+
+                        Log.i("typed",monthlySpendingLimit.toString())
+
+
+                        val calendar = Calendar.getInstance()
+                        calendar.add(Calendar.DAY_OF_MONTH, -30)
+                        val thirtyDaysAgo = calendar.timeInMillis
+
+                        FirebaseDatabase.getInstance().reference.child("users")
+                            .child(FirebaseAuth.getInstance().currentUser!!.uid)
+                            .child("Expenses")
+                            .addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    spentAmount =0
+                                    for(item in snapshot.children){
+                                        if(snapshot.exists())
+                                        {
+                                            val model = item.getValue(Expense::class.java)!!
+                                            var spentAmt = model.amount
+                                            Log.i("spend",spentAmt)
+
+                                            if(spentAmt.contains("."))
+                                            {
+                                                spentAmt = removeDecimal(spentAmt).toString()
+                                            }
+
+
+                                            val datet = model.date
+                                            var timeInMillis = 0L
+                                            if(datet.contains("/"))
+                                            {
+                                                val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                                                val date = format.parse(datet)
+                                                timeInMillis = date?.time ?: 0
+                                            }
+                                            else
+                                            {
+                                                val format = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                                                val date = format.parse(datet)
+                                                timeInMillis = date?.time ?: 0
+                                            }
+
+                                            if(timeInMillis >= thirtyDaysAgo){
+                                                spentAmount += spentAmt.toInt()
+                                            }
+                                        }
+
+                                    }
+                                    Log.i("spentAmount",spentAmount.toString())
+                                    if(spentAmount >= monthlySpendingLimit)
+                                    {
+                                        sendNotification()
+                                    }
+
+                                }
+
+                                override fun onCancelled(error: DatabaseError) {
+                                }
+                            })
+                    }
+
+
+
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+
+
+
+
+
+
+
+    }
+
+    fun sendNotification() {
+
+        notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val intent = Intent(this,  ProfileActivity::class.java)
+
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationChannel = NotificationChannel(channelId, description, NotificationManager.IMPORTANCE_HIGH)
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.GREEN
+            notificationChannel.enableVibration(false)
+            notificationManager.createNotificationChannel(notificationChannel)
+
+            builder = Notification.Builder(this, channelId)
+                .setContentTitle("WARNING: Limit Exceeded")
+                .setContentText("Your monthly spending limit exceeded.")
+                .setSmallIcon(R.drawable.ic_baseline_warning_24)
+                .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.drawable.ic_expense_tracker_icon))
+                .setContentIntent(pendingIntent)
+
+        }
+        else {
+
+            builder = Notification.Builder(this)
+                .setContentTitle("WARNING: Limit Exceeded")
+                .setContentText("Your monthly spending limit exceeded.")
+                .setSmallIcon(R.drawable.ic_baseline_warning_24)
+                .setLargeIcon(BitmapFactory.decodeResource(this.resources, R.drawable.ic_expense_tracker_icon))
+                .setContentIntent(pendingIntent)
+        }
+        notificationManager.notify(1234, builder.build())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
+
+        getLastMonthExpense()
 
         profileToolbar = findViewById(R.id.profileToolbar)
         editProfileButton = findViewById(R.id.editProfileBtn)
@@ -79,10 +240,14 @@ class ProfileActivity : AppCompatActivity() {
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
             .child("profilePicture").addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    val profilePictureUrl = snapshot.value
-                    Glide.with(applicationContext)
-                        .load(profilePictureUrl)
-                        .into(profilePictureIV)
+
+                    if(snapshot.exists()){
+                        val profilePictureUrl = snapshot.value
+                        Glide.with(applicationContext)
+                            .load(profilePictureUrl).placeholder(R.drawable.profile_placeholder)
+                            .into(profilePictureIV)
+                    }
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -91,38 +256,46 @@ class ProfileActivity : AppCompatActivity() {
 
             })
 
+
+        // code to read data from firebase
         FirebaseDatabase.getInstance().reference.child("users")
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
             .child("Priorities").addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    checkPriorList.clear()
-                    for (item in snapshot.children) {
-                        checkPriorList.add(item.key.toString())
+
+                    if(snapshot.exists())
+                    {
+                        checkPriorList.clear()
+                        for (item in snapshot.children) {
+                            checkPriorList.add(item.key.toString())
+                        }
+                        if (checkPriorList.contains("Sports")) {
+                            chipSports.isChecked = true
+                        }
+                        if (checkPriorList.contains("Food")) {
+                            chipFood.isChecked = true
+                        }
+                        if (checkPriorList.contains("Education")) {
+                            chipEducation.isChecked = true
+                        }
+                        if (checkPriorList.contains("Entertainment")) {
+                            chipEntertainment.isChecked = true
+                        }
+                        if (checkPriorList.contains("Travel")) {
+                            chipTravel.isChecked = true
+                        }
+                        if (checkPriorList.contains("Gifts")) {
+                            chipGifts.isChecked = true
+                        }
+                        if (checkPriorList.contains("Clothes")) {
+                            chipClothes.isChecked = true
+                        }
+                        if (checkPriorList.contains("Shopping")) {
+                            chipShopping.isChecked = true
+                        }
                     }
-                    if (checkPriorList.contains("Sports")) {
-                        chipSports.isChecked = true
-                    }
-                    if (checkPriorList.contains("Food")) {
-                        chipFood.isChecked = true
-                    }
-                    if (checkPriorList.contains("Education")) {
-                        chipEducation.isChecked = true
-                    }
-                    if (checkPriorList.contains("Entertainment")) {
-                        chipEntertainment.isChecked = true
-                    }
-                    if (checkPriorList.contains("Travel")) {
-                        chipTravel.isChecked = true
-                    }
-                    if (checkPriorList.contains("Gifts")) {
-                        chipGifts.isChecked = true
-                    }
-                    if (checkPriorList.contains("Clothes")) {
-                        chipClothes.isChecked = true
-                    }
-                    if (checkPriorList.contains("Shopping")) {
-                        chipShopping.isChecked = true
-                    }
+
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -143,17 +316,24 @@ class ProfileActivity : AppCompatActivity() {
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    for (item in snapshot.children) {
-                        if (item.key.toString() == "name") {
-                            name.text = "Name : ${item.value.toString()}"
-                        }
-                        if (item.key.toString() == "income") {
-                            income.text = "Monthly Income : ${item.value.toString()}"
-                        }
-                        if (item.key.toString() == "maxSpendingLimit") {
-                            spendingLimit.text = "Monthly Spending Limit : ${item.value.toString()}"
+
+                    if(snapshot.exists())
+                    {
+                        for (item in snapshot.children) {
+                            if (item.key.toString() == "name") {
+                                name.text = "Name : ${item.value.toString()}"
+                            }
+                            if (item.key.toString() == "income") {
+                                income.text = "Monthly Income : ${item.value.toString()}"
+                            }
+                            if (item.key.toString() == "maxSpendingLimit") {
+                                spendingLimit.text = "Monthly Spending Limit : ${item.value.toString()}"
+                            }
                         }
                     }
+
+
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {

@@ -50,18 +50,24 @@ class GoalActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
 
+
+        // code to read goals from firebase
         FirebaseDatabase.getInstance().reference.child("users")
             .child(FirebaseAuth.getInstance().currentUser!!.uid)
             .child("Goals")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    arrayList.clear()
-                    for(item in snapshot.children){
-                        var model = item.getValue(Goal::class.java)!!
-                        arrayList.add(model)
+                    if(snapshot.exists())
+                    {
+                        arrayList.clear()
+                        for(item in snapshot.children){
+                            var model = item.getValue(Goal::class.java)!!
+                            arrayList.add(model)
+                        }
+                        arrayList.reverse()
+                        adapter.notifyDataSetChanged()
                     }
-                    arrayList.reverse()
-                    adapter.notifyDataSetChanged()
+
                 }
 
                 override fun onCancelled(error: DatabaseError) {

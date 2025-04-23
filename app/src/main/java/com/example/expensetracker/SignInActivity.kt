@@ -71,6 +71,7 @@ class SignInActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
+        // code to sing in with email and password using firebase
         signInButton.setOnClickListener {
 
             if(emailEditText.text.toString().isEmpty()){

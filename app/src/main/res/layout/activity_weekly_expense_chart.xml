@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WeeklyExpenseChart">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/WeekExpAppBarCharts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        app:elevation="0dp"
+        android:background="@android:color/transparent"
+        >
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/weekExpToolbarCharts"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:navigationIconTint="@color/black"
+            app:elevation="0dp"
+            app:title="Weekly Expenses"
+            app:titleTextColor="@color/black">
+        </com.google.android.material.appbar.MaterialToolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.anychart.AnyChartView
+        android:id="@+id/chartViewWeekExp"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_below="@id/WeekExpAppBarCharts"
+        android:layout_marginBottom="16dp" />
+
+
+
+</RelativeLayout>

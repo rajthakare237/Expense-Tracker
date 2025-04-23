@@ -1,5 +1,6 @@
 package com.example.expensetracker.Models
 
+// Model for expense
 data class Expense(
     var amount : String = "",
     var date : String = "",

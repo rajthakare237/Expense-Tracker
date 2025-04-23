@@ -34,6 +34,8 @@ class ForgotPasswordActivity : AppCompatActivity() {
         resetPasswordButton = findViewById(R.id.resetPassword)
         editTextLayout = findViewById(R.id.editTextLayout)
 
+
+        // code to reset the password
         resetPasswordButton.setOnClickListener {
 
             if(editTextForgotPassEmail.text.isEmpty()){

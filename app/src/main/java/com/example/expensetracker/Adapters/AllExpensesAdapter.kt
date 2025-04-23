@@ -19,6 +19,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
 
+// This is a adapter for recycler view to show all expenses items
 class AllExpensesAdapter(val context: Context, val arrayList: ArrayList<Expense>) :
     RecyclerView.Adapter<AllExpensesAdapter.ViewHolder>() {
 
@@ -47,10 +48,11 @@ class AllExpensesAdapter(val context: Context, val arrayList: ArrayList<Expense>
 //        holder.dateAllExp.text = "Date : $dateString"
         holder.dateAllExp.text = "Date : ${model.date}"
 
-        if(model.description.isEmpty()){
+        if(model.description.isNullOrEmpty()){
             holder.descriptionAllExp.visibility = View.GONE
         }
         else{
+            holder.descriptionAllExp.visibility = View.VISIBLE
             holder.descriptionAllExp.text = "${model.description}"
         }
 

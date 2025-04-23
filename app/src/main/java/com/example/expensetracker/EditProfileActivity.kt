@@ -33,6 +33,7 @@ class EditProfileActivity : AppCompatActivity() {
             finish()
         }
 
+        // to save the changes on firebase
         materialToolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.saveProfileEdits -> {

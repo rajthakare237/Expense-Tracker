@@ -92,6 +92,7 @@ class SignUpVerification : AppCompatActivity() {
         }
     }
 
+    // function to add details of user on firebase realtime database
     private fun registerUserOnDatabase(
         email: String,
         password: String
